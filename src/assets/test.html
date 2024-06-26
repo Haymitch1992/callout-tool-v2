@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECharts Long Image Export</title>
+    <!-- 引入 ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
+    <!-- 引入 html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div id="chartContainer" style="width: 6600px; height: 400px; overflow-y: scroll;">
+    <!-- ECharts容器，此处省略ECharts初始化代码 -->
+    <div id="myChart" style="width: 6600px; height: 400px;"></div>
+</div>
+
+<script>
+    // ECharts初始化代码，此处省略具体配置，假设已经正确初始化
+
+    async function exportLongChartImage() {
+        const chartContainer = document.getElementById('chartContainer');
+        const chartCanvas = await html2canvas(chartContainer, {
+            scrollY: 0, // 或者根据需要调整
+            width: chartContainer.offsetWidth,
+            height: chartContainer.scrollHeight, // 重要：使用scrollHeight获取完整高度
+            windowWidth: chartContainer.offsetWidth,
+            windowHeight: chartContainer.scrollHeight,
+            useCORS: true,
+        });
+
+        const imgData = chartCanvas.toDataURL('image/png');
+        downloadImage(imgData, 'echarts_long_image.png');
+    }
+
+    function downloadImage(dataUrl, fileName) {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // 初始化ECharts图表
+    // 假定echarts.init和setOption代码已在此处正确执行
+
+    var chartDom = document.getElementById('myChart');
+var myChart = echarts.init(chartDom);
+var option;
+
+option = {
+  toolbox: {
+    show: true,
+    feature: {
+      saveAsImage: {} // 启用保存为图片功能
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45]
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      data: [150, 230, 224, 218, 135, 147, 260,150, 230, 224, 218, 135, 147, 260,150, 230, 224, 218, 135, 147, 260,150, 230, 224, 218, 135, 147, 260,150, 230, 224, 218, 135, 147, 260,150, 230, 224, 218, 135, 147, 260],
+      type: 'line'
+    }
+  ]
+};
+
+option && myChart.setOption(option);
+setTimeout(() => {
+  exportLongChartImage();
+}, 10000);
+    // 调用导出函数
+
+</script>
+
+</body>
+</html>
