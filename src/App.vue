@@ -21,7 +21,7 @@ const activeName = ref('first');
         <handle-data></handle-data>
       </el-tab-pane>
       <el-tab-pane label="选择算法" name="third">
-        <arithmetic></arithmetic>
+        <arithmetic @changeDate="activeName = 'fourth'"></arithmetic>
       </el-tab-pane>
       <el-tab-pane label="标定结果" name="fourth">
         <result></result>

@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus';
 // 跨域认证信息 header 名
 const xsrfHeaderName = 'X-Auth-Token'
 
-axios.defaults.timeout = 5000
+axios.defaults.timeout = 1000*60*5
 axios.defaults.withCredentials= true
 axios.defaults.xsrfHeaderName= xsrfHeaderName
 axios.defaults.xsrfCookieName= xsrfHeaderName

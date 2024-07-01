@@ -1,8 +1,17 @@
 <template>
   <div>
-    <div class="img-item">示例图片</div>
+    <div class="img-item">
+      <img
+      class="img-demo"
+        :src="
+          'http://172.16.217.152:8000/sensors_data/res_file/' +
+          store.cab_image_path
+        "
+        alt=""
+      />
+    </div>
     <el-input
-      v-model="textarea"
+      v-model="store.extrinsic_value"
       :rows="6"
       type="textarea"
       placeholder="Please input"
@@ -21,15 +30,20 @@
 }
 .img-item {
   background: #f5f7fa;
-  height: 300px;
+  min-height: 300px;
   margin-bottom: 10px;
   border-radius: 4px;
   color: #666;
   text-align: center;
-  line-height: 300px;
+}
+.img-demo{
+  width: 100%;
 }
 </style>
 <script setup>
 import { ref } from 'vue';
+
+import { mainStore } from '../store/index';
+const store = mainStore();
 const textarea = ref('XXXX XXXX XXX');
 </script>

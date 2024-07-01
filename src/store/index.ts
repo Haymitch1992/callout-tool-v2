@@ -7,7 +7,19 @@ export const mainStore = defineStore('main', {
   state: () => { 
     // 定义状态
     return {
-      currentTime:'2023-03-21',
+      // 内参
+      ret: '',
+      mtx: '',
+      dist:'',
+      // 棋盘格路径
+      camera_cab_path: '',
+      // 标定图像路径
+      calibration_image_path: '',
+      // 点云路径
+      pcd_file_path: '',
+      cab_image_path: '',
+      extrinsic_value:''
+      
     }
   },
   getters: {

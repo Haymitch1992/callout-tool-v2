@@ -31,3 +31,12 @@ export async function getIntrinsic(loginForm:any) {
   return request('/callout/sensors_data/intrinsic_value/',METHOD.GET,loginForm)
 }
 
+// 生成外参/
+export async function postSelect_type(loginForm:any) { 
+  return request('/callout/sensors_data/select_type/',METHOD.POST,loginForm)
+}
+
+// 查询生成状态
+export async function getStatus(loginForm:any) { 
+  return request('/callout/sensors_data/get_message/',METHOD.GET,loginForm)
+}

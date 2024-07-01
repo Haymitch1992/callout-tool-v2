@@ -1,79 +1,101 @@
 <template>
   <div>
-    <div class="card-item card-item-1">
-      <!-- 棋盘格数据独占一行 -->
-      <!-- 标定图像 跟 点云数据 对比显示 -->
-      <h2>棋盘格图像</h2>
-      <el-tag>{{ chooseArr }}</el-tag>
-      <ul class="choose-ul">
-        <li v-for="item in chooseArr">
-          <img
-            v-if="item.choose && item.label.split('.').pop() === 'png'"
-            class="img-item"
-            :src="
-              'http://172.16.217.152:8000/sensors_data/res_file/' + item.label
-            "
-            alt=""
-          />
-        </li>
-      </ul>
-      <h3>3*3矩阵</h3>
-      <el-tag v-for="item in mtx" class="tag-item">{{ item }}</el-tag>
-      <h3>参数</h3>
-      <el-tag v-for="item in dist">{{ item }}</el-tag>
-
-      <!-- <el-input
-        type="textarea"
-        :autosize="{ minRows: 4, maxRows: 6 }"
-        placeholder="请输入内参参数"
-        v-model="argumentsValue"
-      ></el-input> -->
-      <div class="btn-line">
-        <el-button @click="getIntrinsicData()">生成内参</el-button>
-        <!-- <h2>棋盘格图形</h2>-->
-        <el-button type="primary" @click="dialogVisible = true"
-          >选择路径</el-button
-        >
-      </div>
+    <div class="btn-select-line">
+      <el-button @click="currentPage = 1">棋盘格图像</el-button>
+      <el-button @click="currentPage = 2">标定图像/点云数据</el-button>
     </div>
-    <div class="card-item">
-      <div class="card-left">
-        <h2>标定图像</h2>
 
-        <el-tag>{{ chooseArr3.label }}</el-tag>
-        <ul class="choose-ul">
-          <li>
+    <div class="card-item card-item-1" v-if="currentPage === 1">
+      <div>
+        <h2>棋盘格图像</h2>
+        <el-tag
+          v-if="
+            chooseArr.length > 0 &&
+            chooseArr[0].label.split('.').pop() === 'png'
+          "
+          >路径：{{ saveImagePath }}</el-tag
+        >
+        <ul class="choose-ul" >
+          <li v-for="item in chooseArr">
             <img
-              v-if="
-                chooseArr3.choose && chooseArr3.label.split('.').pop() === 'png'
-              "
-              class="choose-img"
+              v-if="item.choose && item.label.split('.').pop() === 'png'"
+              class="img-item"
               :src="
-                'http://172.16.217.152:8000/sensors_data/res_file/' +
-                chooseArr3.label
+                'http://172.16.217.152:8000/sensors_data/res_file/' + item.label
               "
               alt=""
             />
           </li>
         </ul>
-        <el-button type="primary" @click="dialogVisible3 = true"
-          >选择路径</el-button
-        >
-      </div>
-      <div class="card-right">
-        <h2>点云数据</h2>
-        <el-tag>{{ chooseArr2 }}</el-tag>
-        <pcd-item
-          v-if="chooseArr2.length !== 0"
-          :pcdPath="chooseArr2"
-        ></pcd-item>
 
-        <el-button type="primary" @click="dialogVisible2 = true"
-          >选择路径</el-button
-        >
+        <!-- <el-tag class="tag-item" v-for="item in mtx">{{ item }}</el-tag> -->
+        <div v-if="dist.length !== 0">
+          <h2>3*3矩阵</h2>
+          <el-input class="el-input-item" v-model="mtx[0]"></el-input>
+          <el-input class="el-input-item" v-model="mtx[1]"></el-input>
+          <el-input class="el-input-item" v-model="mtx[2]"></el-input>
+          <h2>参数</h2>
+          <el-input v-model="dist"></el-input>
+        </div>
+
+        <div class="btn-line">
+          <el-button @click="getIntrinsicData()">生成内参</el-button>
+          <!-- <h2>棋盘格图形</h2>-->
+          <el-button type="primary" @click="dialogVisible = true"
+            >选择路径</el-button
+          >
+        </div>
+      </div>
+
+      <!-- 棋盘格数据独占一行 -->
+      <!-- 标定图像 跟 点云数据 对比显示 -->
+    </div>
+    <div v-if="currentPage === 2">
+      <div class="card-item">
+        <div class="card-left">
+          <h2>标定图像</h2>
+          <div style="width: 200px">
+            <el-tag v-if="chooseArr3.label" style="margin-bottom: 10px"
+              >路径：{{ chooseArr3.label }}</el-tag
+            >
+          </div>
+
+          <ul class="choose-ul">
+            <li>
+              <img
+                v-if="
+                  chooseArr3.choose &&
+                  chooseArr3.label.split('.').pop() === 'png'
+                "
+                class="choose-img"
+                :src="
+                  'http://172.16.217.152:8000/sensors_data/res_file/' +
+                  chooseArr3.label
+                "
+                alt=""
+              />
+            </li>
+          </ul>
+          <el-button type="primary" @click="dialogVisible3 = true"
+            >选择路径</el-button
+          >
+        </div>
+        <div class="card-right">
+          <h2>点云数据</h2>
+          <el-tag v-if="chooseArr2.length !== 0" style="margin-bottom: 10px">{{
+            chooseArr2
+          }}</el-tag>
+          <pcd-item
+            v-if="chooseArr2.length !== 0"
+            :pcdPath="chooseArr2"
+          ></pcd-item>
+
+          <el-button type="primary" @click="dialogVisible2 = true"
+            >选择路径</el-button
+          >
+        </div>
       </div>
     </div>
-
     <el-dialog
       v-model="dialogVisible"
       title="棋盘格图像路径选择"
@@ -133,7 +155,10 @@ import { ref, onMounted } from 'vue';
 import { getFiles, getIntrinsic } from '../api/base';
 import pcdItem from './pcdItem2.vue';
 import { MixOperation } from 'three';
+import { mainStore } from '../store/index';
+const store = mainStore();
 
+const currentPage = ref(1);
 const chooseArr = ref([]);
 const saveImagePath = ref('');
 const argumentsValue = ref('');
@@ -171,6 +196,10 @@ const getIntrinsicData = () => {
     mtx.value = res.data.mtx;
     dist.value = res.data.dist;
     argumentsValue.value = JSON.stringify(res.data);
+    store.ret = res.data.ret
+    store.mtx = res.data.mtx
+    store.dist = res.data.dist
+
   });
 };
 
@@ -194,6 +223,7 @@ const handleNodeClick = (
   let str = chooseArr.value[0].label || '';
   // 获取当前节点的path
   saveImagePath.value = calcPath(str);
+  store.camera_cab_path = saveImagePath.value;
 };
 
 const handleNodeClick3 = (
@@ -203,7 +233,9 @@ const handleNodeClick3 = (
   halfCheckedKeys
 ) => {
   console.log(checkedNodes, checkedKeys, halfCheckedNodes, halfCheckedKeys);
+
   chooseArr3.value = checkedNodes;
+  store.calibration_image_path = chooseArr3.value.label;
 };
 
 const handleNodeClick2 = (
@@ -220,6 +252,7 @@ const handleNodeClick2 = (
   } else {
     chooseArr2.value = checkedNodes.label;
     dialogVisible2.value = false;
+    store.pcd_file_path = chooseArr2.value;
   }
 };
 
@@ -267,6 +300,8 @@ onMounted(() => {
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 660px;
+  overflow: auto;
 }
 .choose-ul li {
   display: inline-block;
@@ -315,5 +350,26 @@ h2 {
 }
 .tag-item {
   margin-right: 10px;
+}
+.btn-select-line {
+  text-align: left;
+  margin-bottom: 10px;
+}
+h2 {
+  margin: 0;
+  padding: 0;
+  color: #409eff;
+  font-size: 20px;
+  font-weight: bold;
+  display: inline-block;
+  text-align: left;
+  width: 100%;
+  line-height: 40px;
+  padding-bottom: 20px;
+}
+.el-input-item {
+  width: 200px;
+  display: block;
+  margin: 4px;
 }
 </style>
