@@ -1,7 +1,7 @@
 <template>
   <div
     ref="threeContainer"
-    style="width: 720px; height: 400px; overflow: hidden; margin-bottom: 10px"
+    style="width: 100%; height: 450px; overflow: hidden; margin-bottom: 10px"
   ></div>
 </template>
 
@@ -65,6 +65,10 @@ const init = () => {
       gui.add(points.material, 'size', 0.001, 0.01).onChange(render);
       gui.addColor(points.material, 'color').onChange(render);
       gui.open();
+
+      points.position.set(-50, 0, 0); // x, y, z
+
+      render();
     }
   );
 

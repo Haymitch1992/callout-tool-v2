@@ -11,14 +11,19 @@
         <el-tag
           v-if="
             chooseArr.length > 0 &&
-            chooseArr[0].label.split('.').pop() === 'png'
+            (chooseArr[0].label.split('.').pop() === 'png' ||
+              chooseArr[0].label.split('.').pop() === 'jpg')
           "
           >路径：{{ saveImagePath }}</el-tag
         >
-        <ul class="choose-ul" >
+        <ul class="choose-ul">
           <li v-for="item in chooseArr">
             <img
-              v-if="item.choose && item.label.split('.').pop() === 'png'"
+              v-if="
+                item.choose &&
+                (item.label.split('.').pop() === 'png' ||
+                  item.label.split('.').pop() === 'jpg')
+              "
               class="img-item"
               :src="
                 'http://172.16.217.152:8000/sensors_data/res_file/' + item.label
@@ -31,11 +36,23 @@
         <!-- <el-tag class="tag-item" v-for="item in mtx">{{ item }}</el-tag> -->
         <div v-if="dist.length !== 0">
           <h2>3*3矩阵</h2>
-          <el-input class="el-input-item" v-model="mtx[0]"></el-input>
-          <el-input class="el-input-item" v-model="mtx[1]"></el-input>
-          <el-input class="el-input-item" v-model="mtx[2]"></el-input>
+          <el-input
+            class="el-input-item"
+            v-model="mtx[0]"
+            :disabled="true"
+          ></el-input>
+          <el-input
+            class="el-input-item"
+            v-model="mtx[1]"
+            :disabled="true"
+          ></el-input>
+          <el-input
+            class="el-input-item"
+            v-model="mtx[2]"
+            :disabled="true"
+          ></el-input>
           <h2>参数</h2>
-          <el-input v-model="dist"></el-input>
+          <el-input v-model="dist" :disabled="true"></el-input>
         </div>
 
         <div class="btn-line">
@@ -51,49 +68,55 @@
       <!-- 标定图像 跟 点云数据 对比显示 -->
     </div>
     <div v-if="currentPage === 2">
-      <div class="card-item">
-        <div class="card-left">
-          <h2>标定图像</h2>
-          <div style="width: 200px">
-            <el-tag v-if="chooseArr3.label" style="margin-bottom: 10px"
-              >路径：{{ chooseArr3.label }}</el-tag
-            >
-          </div>
-
-          <ul class="choose-ul">
-            <li>
-              <img
-                v-if="
-                  chooseArr3.choose &&
-                  chooseArr3.label.split('.').pop() === 'png'
-                "
-                class="choose-img"
-                :src="
-                  'http://172.16.217.152:8000/sensors_data/res_file/' +
-                  chooseArr3.label
-                "
-                alt=""
-              />
-            </li>
-          </ul>
-          <el-button type="primary" @click="dialogVisible3 = true"
+      <div class="card-item card-item-1">
+        <h2>标定图像</h2>
+        <div style="margin-bottom: 4px">
+          <el-tag class="margin-right-10" v-if="chooseArr3.label"
+            >路径：{{ chooseArr3.label }}</el-tag
+          >
+          <el-button
+            class="left-btn"
+            type="primary"
+            size="small"
+            @click="dialogVisible3 = true"
             >选择路径</el-button
           >
         </div>
-        <div class="card-right">
-          <h2>点云数据</h2>
-          <el-tag v-if="chooseArr2.length !== 0" style="margin-bottom: 10px">{{
+
+        <ul class="choose-ul">
+          <li>
+            <img
+              v-if="
+                (chooseArr3.choose &&
+                  chooseArr3.label.split('.').pop() === 'png') ||
+                (chooseArr3.choose &&
+                  chooseArr3.label.split('.').pop() === 'jpg')
+              "
+              class="choose-img"
+              :src="
+                'http://172.16.217.152:8000/sensors_data/res_file/' +
+                chooseArr3.label
+              "
+              alt=""
+            />
+          </li>
+        </ul>
+      </div>
+      <div class="card-item card-item-1">
+        <h2>点云数据</h2>
+        <div style="margin-bottom: 4px">
+          <el-tag v-if="chooseArr2.length !== 0" class="margin-right-10">{{
             chooseArr2
           }}</el-tag>
-          <pcd-item
-            v-if="chooseArr2.length !== 0"
-            :pcdPath="chooseArr2"
-          ></pcd-item>
-
-          <el-button type="primary" @click="dialogVisible2 = true"
+          <el-button size="small" type="primary" @click="dialogVisible2 = true"
             >选择路径</el-button
           >
         </div>
+
+        <pcd-item
+          v-if="chooseArr2.length !== 0"
+          :pcdPath="chooseArr2"
+        ></pcd-item>
       </div>
     </div>
     <el-dialog
@@ -156,6 +179,7 @@ import { getFiles, getIntrinsic } from '../api/base';
 import pcdItem from './pcdItem2.vue';
 import { MixOperation } from 'three';
 import { mainStore } from '../store/index';
+import { ElLoading } from 'element-plus';
 const store = mainStore();
 
 const currentPage = ref(1);
@@ -187,8 +211,13 @@ const getTreeData = () => {
     // 数据处理成 树形控件需要的格式
   });
 };
-
+var loadingInstance1 = null;
 const getIntrinsicData = () => {
+  loadingInstance1 = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  });
   getIntrinsic({
     camera_cab_path: saveImagePath.value,
   }).then((res) => {
@@ -196,10 +225,10 @@ const getIntrinsicData = () => {
     mtx.value = res.data.mtx;
     dist.value = res.data.dist;
     argumentsValue.value = JSON.stringify(res.data);
-    store.ret = res.data.ret
-    store.mtx = res.data.mtx
-    store.dist = res.data.dist
-
+    store.ret = res.data.ret;
+    store.mtx = res.data.mtx;
+    store.dist = res.data.dist;
+    loadingInstance1.close();
   });
 };
 
@@ -342,7 +371,7 @@ h2 {
   padding: 10px;
 }
 .choose-img {
-  width: 100%;
+  width: 400px;
   border-radius: 4px;
 }
 .btn-line {
@@ -371,5 +400,8 @@ h2 {
   width: 200px;
   display: block;
   margin: 4px;
+}
+.margin-right-10 {
+  margin-right: 10px;
 }
 </style>

@@ -40,3 +40,7 @@ export async function postSelect_type(loginForm:any) {
 export async function getStatus(loginForm:any) { 
   return request('/callout/sensors_data/get_message/',METHOD.GET,loginForm)
 }
+// 调节参数/
+export async function postAlter_extrinsic_value(loginForm:any) { 
+  return request('/callout/sensors_data/alter_extrinsic_value/',METHOD.POST,loginForm)
+}

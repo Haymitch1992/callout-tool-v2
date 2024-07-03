@@ -18,8 +18,13 @@ export const mainStore = defineStore('main', {
       // 点云路径
       pcd_file_path: '',
       cab_image_path: '',
-      extrinsic_value:''
-      
+      extrinsic_value:'',
+      r_matrix: '',
+      r_vector: '',
+      t_matrix: '',
+      extrinsic_path: '',
+      camera_txt_path:''
+
     }
   },
   getters: {

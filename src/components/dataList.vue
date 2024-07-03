@@ -20,7 +20,18 @@ const sendParesData = (obj) => {
       message: '请求发送成功',
       type: 'success',
     });
+    if (timer) {
+      clearInterval(timer);
+    } else {
+      setIntervalGetList();
+    }
   });
+};
+var timer = null;
+const setIntervalGetList = () => {
+  timer = setInterval(() => {
+    getInfo();
+  }, 1000 * 2);
 };
 
 onMounted(() => {
